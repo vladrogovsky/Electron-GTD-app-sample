@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script type="text/javascript" src="jquery-1.11.1.min.js"></script>
+    <script>if (window.module) module = window.module;</script>
+    <script type="text/javascript" src="goldenlayout.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="goldenlayout-base.css" />
+    <link type="text/css" rel="stylesheet" href="goldenlayout-light-theme.css" />
+    <script type="text/javascript">
+window.onload = function(){
+   $('.lm_header').attr('dragabble','true');
+  var config = {
+    content: [{
+        type: 'row',
+        content:[{
+            type: 'component',
+            componentName: 'Google Calendar',
+            componentState: { label: 'Google Calendar' }
+        },{
+            type: 'column',
+            content:[{
+                type: 'component',
+                componentName: 'Google Keep',
+                componentState: { label: 'Google Keep' }
+            },{
+                type: 'component',
+                componentName: 'Remeber The Milk',
+                componentState: { label: 'Remeber The Milk' }
+            }]
+        }]
+    }]
+  };
+  var myLayout,
+  savedState = localStorage.getItem( 'savedState' );
+  if( savedState !== null ) {
+      myLayout = new GoldenLayout( JSON.parse( savedState ) );
+  } else {
+      myLayout = new GoldenLayout( config );
+  }
+  myLayout.on( 'stateChanged', function(){
+      var state = JSON.stringify( myLayout.toConfig() );
+      localStorage.setItem( 'savedState', state );
+  });
+
+myLayout.registerComponent( 'Google Calendar', function( container, componentState ){
+  var counter = $( '<div class="GCalCounter"></div>' );
+   container.on( 'tab', function( tab ){
+       tab.element.append( counter );
+       tab.element.addClass("GcalTab");
+   })
+   container.on( 'show', function( tab ){
+       changeColor(container.getElement(),"CalendarColor");
+   })
+    container.getElement().html( '<webview id="gcalendar" autosize src="https://calendar.google.com/calendar/r/" style="display:inline-flex; width:100%;height:100%;"  preload="./noti302.js"></webview>' );
+})
+myLayout.registerComponent( 'Google Keep', function( container, componentState ){
+  var counter = $( '<div class="GKeepCounter"></div>' );
+   container.on( 'tab', function( tab ){
+       tab.element.append( counter );
+       tab.element.addClass("GKeepTab");
+   })
+   container.on( 'show', function( tab ){
+       changeColor(container.getElement(),"keepColor");
+   })
+    container.getElement().html( '<webview id="gkeep" autosize src="https://keep.google.com/u/0/" style="display:inline-flex; width:100%;height:100%;"  preload="./noti302.js"></webview>' );
+})
+myLayout.registerComponent( 'Remeber The Milk', function( container, componentState ){
+  var counter = $( '<div class="RtmCounter"></div>' );
+   container.on( 'tab', function( tab ){
+       tab.element.append( counter );
+       tab.element.addClass("RtmTab");
+   })
+   container.on( 'show', function( tab ){
+       changeColor(container.getElement(),"RTMColor");
+   })
+
+    container.getElement().html( '<webview id="rtm" autosize src="http://www.bennish.net/web-notifications.html" style="display:inline-flex; width:100%;height:100%;"  preload="./noti302.js"></webview>' );
+})
+myLayout.init();
+  var webview1 = document.getElementById("gcalendar");
+  webview1.addEventListener('did-get-response-details', function() {
+    webview1.setZoomLevel(1.75);
+  })
+
+  var webview2 = document.getElementById("gkeep");
+  webview2.addEventListener('did-get-response-details', function() {
+    webview2.setZoomLevel(1.75);
+  })
+
+  var webview3 = document.getElementById("rtm");
+  webview3.addEventListener('did-get-response-details', function() {
+    webview3.setZoomLevel(1.75);
+  })
+  function changeColor(elementHeader,colorClass){
+    var Colors = ["keepColor","CalendarColor","RTMColor"];
+    Colors.splice(Colors.indexOf(colorClass),1);
+    for (var i = 0; i < Colors.length; i++) {
+      elementHeader.parent().parent().parent().find(".lm_header").removeClass(Colors[i]);
+    }
+    elementHeader.parent().parent().parent().find(".lm_header").addClass(colorClass);
+  }
+}
+</script>
+<style media="screen">
+  .keepColor{
+    background: #fbbf20;
+  }
+  .RTMColor{
+    background: #a7b5ff;
+  }
+  .CalendarColor{
+    background: #fff;
+  }
+  .lm_controls,.lm_close_tab {
+    display: none !important;
+  }
+  .lm_content{
+    background: transparent !important;
+    border:none !important;
+  }
+  .GcalTab {
+    background: #5148B2 !important;
+    color: #fff !important;
+    border-radius: 5px 5px 0px 0px;
+    font-weight: bold;
+    transition: 0.1s all ease-out;
+  }
+  .GKeepTab {
+    background: #ffc52a !important;
+    color: #000 !important;
+    border-radius: 5px 5px 0px 0px;
+    font-weight: bold;
+    transition: 0.1s all ease-out;
+  }
+  .RtmTab {
+    background: #fff !important;
+    color: #000 !important;
+    border-radius: 5px 5px 0px 0px;
+    font-weight: bold;
+    transition: 0.1s all ease-out;
+  }
+  .RtmTab.lm_active,.RtmTab:hover {
+    border-left: 2px solid #6b7ee7 !important;
+    border-right: 2px solid #6b7ee7 !important;
+    border-bottom: none !important;
+    border-top: none !important;
+  }
+  .GcalTab.lm_active,.GcalTab:hover {
+    border-left: 2px solid #130083 !important;
+    border-right: 2px solid #130083 !important;
+    border-bottom: none !important;
+    border-top: none !important;
+  }
+  .GKeepTab.lm_active,.GKeepTab:hover {
+    border-left: 2px solid #bb8b0c !important;
+    border-right: 2px solid #bb8b0c !important;
+    border-bottom: none !important;
+    border-top: none !important;
+  }
+  .winControls{
+    width: 130px;
+    height: 21px;
+    position: absolute;
+    background: #000;
+    top: 0px;
+    right: 0px;
+    z-index: 2;
+    display: none; /*for now*/
+  }
+</style>
+  </head>
+  <body>
+  <div class="winControls" draggable="true">
+
+  </div>
+  </body>
+</html>
